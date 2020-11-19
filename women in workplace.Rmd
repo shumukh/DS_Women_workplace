@@ -1,0 +1,89 @@
+---
+title: "women in the workplace"
+author: "Shumukh Alshareef"
+date: "١٩ نوفمبر، ٢٠٢٠"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(tidyverse)
+jobs_gender <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-03-05/jobs_gender.csv")
+earnings_female <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-03-05/earnings_female.csv") 
+employed_gender <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-03-05/employed_gender.csv") 
+
+```
+
+```{r}
+jobs_gender %>%
+  count(major_category)
+```
+
+```{r}
+jobs_gender%>%
+  group_by( year , major_category)%>%
+  summarise(total_workers = sum(total_workers),
+            workers_male = sum (workers_male),
+            workers_female = sum(workers_female))
+```
+
+```{r}
+#How much the percentage of women`s profits in the 2015 ?
+jobs_gender %>%
+filter(year == 2015 )%>%
+mutate(wage_percent_of_male = total_earnings_female/total_earnings_male)%>%
+select(year, major_category ,wage_percent_of_male)
+```
+
+
+```{r}
+#What is the profit rate of female workers in the Services sectorin 2016 ?
+jobs_gender %>%
+filter(year == 2016 , major_category == "Service") %>%
+mutate(wage_percent_of_male = total_earnings_female/total_earnings_male)%>%
+select( year , wage_percent_of_male)
+
+```
+
+
+
+
+
+```{r}
+#A plot showing the total earning in the mejor category for each year
+jobs_gender %>%
+group_by(year, major_category) %>%
+summarise(jobs_gender)%>%
+ggplot(aes(year ,total_earnings , color= major_category)) + geom_line()
+```
+```{r}
+#A plot showing the wage percent of female  each year
+ggplot(jobs_gender,aes(year, wage_percent_of_male )) + geom_line()
+
+```
+
+```{r}
+#which sector contains the largest number of workers from 2013 to 2016
+ggplot(jobs_gender,aes(year, total_workers ,color= major_category)) + geom_point()
+```
+
+```{r}
+#make scatter showing Percentage of female profit to workers in the healthcare practitioners and technical sector in 2016
+jobs_gender %>%
+filter(year== 2016)%>%
+filter(major_category== "Healthcare Practitioners and Technical")%>%
+mutate(wage_percent_of_male = total_earnings_female/total_earnings_male)%>%
+arrange(desc(wage_percent_of_male))%>%
+select(occupation , total_workers , workers_female , wage_percent_of_male) %>%
+ggplot(aes(total_workers, workers_female / total_workers, color=wage_percent_of_male)) + geom_point()+
+  scale_x_log10()
+
+```
+
+
+
+
